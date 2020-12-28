@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: install apt packages
         run: |
-          apt update -y -qq
-          apt install -y gcc sudo
+          sudo apt update -y -qq
+          sudo apt install -y gcc sudo
       - name: setup go
         uses: actions/setup-go@v2
         with:
