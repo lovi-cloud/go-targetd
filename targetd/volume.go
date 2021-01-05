@@ -101,3 +101,19 @@ func (c *Client) CopyVolume(ctx context.Context, poolName, originalVolumeName, n
 
 	return nil
 }
+
+// GetVolume retrieve volume from volume name
+func (c *Client) GetVolume(ctx context.Context, poolName, volumeName string) (*Volume, error) {
+	volumes, err := c.GetVolumeList(ctx, poolName)
+	if err != nil {
+		return nil, fmt.Errorf("faeiled to retrieve list of volume: %w", err)
+	}
+
+	for _, vol := range volumes {
+		if vol.Name == volumeName {
+			return &vol, nil
+		}
+	}
+
+	return nil, fmt.Errorf("%s is not found in vol_list", volumeName)
+}
