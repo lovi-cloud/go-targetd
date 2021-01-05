@@ -30,3 +30,19 @@ func (c *Client) GetPoolList(ctx context.Context) ([]Pool, error) {
 
 	return pools, nil
 }
+
+// GetPool retrieve pool from name of pool
+func (c *Client) GetPool(ctx context.Context, poolName string) (*Pool, error) {
+	pools, err := c.GetPoolList(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve list of pool: %w", err)
+	}
+
+	for _, pool := range pools {
+		if pool.Name == poolName {
+			return &pool, nil
+		}
+	}
+
+	return nil, fmt.Errorf("%s is not found in pool_list", poolName)
+}
