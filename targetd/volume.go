@@ -80,13 +80,14 @@ func (c *Client) DestroyVolume(ctx context.Context, poolName, volumeName string)
 
 // CopyVolume copy a volume.
 // you need to set zfs_enable_copy if use ZFS backend.
-func (c *Client) CopyVolume(ctx context.Context, poolName, originalVolumeName, newVolumeName string) error {
+func (c *Client) CopyVolume(ctx context.Context, poolName, originalVolumeName, newVolumeName string, sizeByte int) error {
 	method := "vol_copy"
 
 	param := map[string]interface{}{
 		"pool":     poolName,
 		"vol_orig": originalVolumeName,
 		"vol_new":  newVolumeName,
+		"size":     sizeByte,
 	}
 
 	req, err := c.newRequest(ctx, method, param)
