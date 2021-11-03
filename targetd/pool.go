@@ -2,6 +2,7 @@ package targetd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 )
 
@@ -11,7 +12,7 @@ type Pool struct {
 	Size     int64  `json:"size"`
 	FreeSize int64  `json:"free_size"`
 	Type     string `json:"type"`
-	UUID     int64  `json:"uuid"`
+	UUID     string `json:"uuid"`
 }
 
 // GetPoolList retrieve list of volume pool
@@ -23,9 +24,30 @@ func (c *Client) GetPoolList(ctx context.Context) ([]Pool, error) {
 		return nil, fmt.Errorf(ErrCreateRequest+": %w", err)
 	}
 
-	var pools []Pool
-	if err := c.request(req, &pools); err != nil {
+	type jsonPool struct {
+		Name     string `json:"name"`
+		Size     int64  `json:"size"`
+		FreeSize int64  `json:"free_size"`
+		Type     string `json:"type"`
+		// targetd response not quoted number, but `uuid` is string
+		// ref: https://github.com/open-iscsi/targetd/blob/d694b77c0dd0cc00d72761c6584bbc302d621a04/API.md?plain=1#L25
+		UUID json.Number `json:"uuid"`
+	}
+
+	var resp []jsonPool
+	if err := c.request(req, &resp); err != nil {
 		return nil, fmt.Errorf(ErrRequest+": %w", err)
+	}
+
+	var pools []Pool
+	for _, r := range resp {
+		pools = append(pools, Pool{
+			Name:     r.Name,
+			Size:     r.Size,
+			FreeSize: r.FreeSize,
+			Type:     r.Type,
+			UUID:     r.UUID.String(),
+		})
 	}
 
 	return pools, nil
