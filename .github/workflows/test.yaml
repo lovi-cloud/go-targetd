@@ -1,0 +1,24 @@
+name: test
+on:
+  push:
+    branches:
+      - "**"
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: install apt packages
+        run: |
+          sudo apt update -y -qq
+          sudo apt install -y gcc sudo
+      - name: setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15'
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: test
+        run: $(echo $(which go)) test -v ./...
